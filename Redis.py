@@ -14,12 +14,18 @@ class Redis:
     def run(self):
         stats = {}
         status, out = commands.getstatusoutput(self.redis_info_cmd())
+
         if status != 0:
             return stats
+
         # Grab every statistic available and leave it to the end user to
         # determine which fields they care about
-        for key, val in [line.split(':') for line in out.splitlines()]:
-            stats[key] = val
+        for line in out.splitlines():
+            split = line.split(':', 2)
+
+            if len(split) == 2:
+                stats[split[0]] = split[1]
+
         return stats
 
     def redis_info_cmd(self):
